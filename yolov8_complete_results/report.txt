@@ -1,0 +1,41 @@
+
+YOLOv8 OBJECT DETECTION TRAINING REPORT
+============================================================
+
+📊 DATASET INFORMATION:
+- Training images: 1547
+- Validation images: 331
+- Classes: 26
+- Class names: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'traffic light', 'stop sign', 'bench', 'bird', 'cat', 'dog', 'horse', 'cow', 'elephant', 'bottle', 'cup', 'bowl', 'pizza', 'cake', 'chair', 'couch', 'potted plant', 'bed']
+
+⚙️ TRAINING CONFIGURATION:
+- Model: YOLOv8S
+- Epochs: 50
+- Image size: 640
+- Batch size: 16
+- Optimizer: Auto (AdamW)
+
+🎯 PERFORMANCE METRICS:
+- mAP@0.5: 0.6664
+- mAP@0.5:0.95: 0.4321
+- Precision: 0.7778
+- Recall: 0.5144
+
+⚡ INFERENCE SPEED:
+- Average time: 11.38 ms per image
+- FPS: 87.87
+
+📈 EXPECTED vs ACTUAL:
+- Expected mAP@0.5 > 0.85: ⚠️ NOT MET
+- Expected FPS 30-50: ⚠️ NOT MET
+
+📁 FILES SAVED:
+- best_model.pt - Best trained model (epoch ?)
+- last_model.pt - Last epoch model
+- dataset.yaml - Dataset configuration
+- training_results.csv - Training history
+- *.png - Training plots and visualizations
+- inference.py - Ready-to-use inference script
+- requirements.txt - Python dependencies
+
+============================================================

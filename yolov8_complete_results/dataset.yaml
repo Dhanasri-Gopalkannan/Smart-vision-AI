@@ -1,0 +1,32 @@
+names:
+- person
+- bicycle
+- car
+- motorcycle
+- airplane
+- bus
+- train
+- truck
+- traffic light
+- stop sign
+- bench
+- bird
+- cat
+- dog
+- horse
+- cow
+- elephant
+- bottle
+- cup
+- bowl
+- pizza
+- cake
+- chair
+- couch
+- potted plant
+- bed
+nc: 26
+path: /content/dataset_processing_output/detection_processed
+test: val/images
+train: train/images
+val: val/images
