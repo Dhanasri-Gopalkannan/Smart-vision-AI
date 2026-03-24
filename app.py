@@ -65,7 +65,7 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     .metric-card {
-        background-color: white;
+        background-color: Black;
         padding: 1rem;
         border-radius: 0.5rem;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
@@ -179,10 +179,6 @@ def init_session_state():
         else:
             st.session_state.detection_status = "❌ Not Found"
     
-    # Webcam state
-    if 'webcam_active' not in st.session_state:
-        st.session_state.webcam_active = False
-    
     # Results storage
     if 'classification_results' not in st.session_state:
         st.session_state.classification_results = {}
@@ -198,14 +194,12 @@ with st.sidebar:
     st.title("SmartVision AI")
     st.markdown("---")
     
-    # Navigation
+    # Navigation (About page removed)
     pages = {
         "🏠 Home": "Home",
         "📷 Image Classification": "Classification", 
         "🎯 Object Detection": "Detection",
-        "📊 Model Performance": "Performance",
-        "📹 Live Webcam": "Webcam",
-        "ℹ️ About": "About"
+        "📊 Model Performance": "Performance"
     }
     
     for emoji, page in pages.items():
@@ -396,7 +390,7 @@ def load_training_history():
 # ========== PAGE FUNCTIONS ==========
 
 def home_page():
-    """Home page with overview and instructions"""
+    """Home page with overview, instructions, and about information"""
     
     st.markdown("<h1 class='main-header'>SmartVision AI</h1>", unsafe_allow_html=True)
     st.markdown("<h3 class='sub-header'>Your Trained Models in Action</h3>", unsafe_allow_html=True)
@@ -490,6 +484,71 @@ def home_page():
         if st.button("Go to Performance →", key="home_perf"):
             st.session_state.page = "Performance"
             st.rerun()
+    
+    st.markdown("---")
+    
+    # About section (merged from about page)
+    st.markdown("## ℹ️ About SmartVision AI")
+    
+    col1, col2 = st.columns([2, 1])
+    
+    with col1:
+        st.markdown("""
+        ### 🎯 Project Overview
+        
+        SmartVision AI is a comprehensive computer vision application that uses your 
+        **trained models** for object detection and classification.
+        
+        #### ✨ Features Using Your Models
+        
+        - **Multi-model Classification**: Compare results from your trained VGG16, ResNet50, 
+          MobileNetV2, and EfficientNetB0 models
+        - **YOLOv8 Detection**: Real-time object detection with your trained YOLO model
+        - **Performance Dashboard**: View actual metrics from your training
+        - **26 Object Classes**: Your model's trained categories
+        """)
+        
+        st.markdown(f"""
+        #### 📊 Your Model Performance
+        
+        **Classification Models**
+        - **VGG16**: {Config.CLASSIFICATION_METRICS['VGG16']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['VGG16']['time_ms']}ms
+        - **ResNet50**: {Config.CLASSIFICATION_METRICS['ResNet50']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['ResNet50']['time_ms']}ms
+        - **MobileNetV2**: {Config.CLASSIFICATION_METRICS['MobileNetV2']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['MobileNetV2']['time_ms']}ms
+        - **EfficientNetB0**: {Config.CLASSIFICATION_METRICS['EfficientNetB0']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['EfficientNetB0']['time_ms']}ms
+        
+        **Detection Model**
+        - **YOLOv8s**: {Config.YOLO_METRICS['mAP50']:.1%} mAP@0.5, {Config.YOLO_METRICS['fps']:.1f} FPS
+        - **{len(Config.CLASS_NAMES)} trained classes**
+        """)
+    
+    with col2:
+        st.markdown("""
+        ### 📁 Model Locations
+        
+        #### Classification Models
+        """)
+        
+        for model_name, path in Config.CLASSIFICATION_MODELS.items():
+            exists = os.path.exists(path)
+            status = "✅" if exists else "❌"
+            st.markdown(f"{status} **{model_name}**: `{os.path.basename(path)}`")
+        
+        st.markdown("#### Detection Model")
+        yolo_exists = os.path.exists(Config.YOLO_MODEL_PATH)
+        status = "✅" if yolo_exists else "❌"
+        st.markdown(f"{status} **YOLOv8**: `{os.path.basename(Config.YOLO_MODEL_PATH)}`")
+        
+        st.markdown("---")
+        st.markdown(f"**Base Path:** `{Config.BASE_PATH}`")
+        
+        st.markdown("---")
+        st.markdown("""
+        ### 👨‍💻 Technologies Used
+        - **Frontend**: Streamlit
+        - **ML Framework**: TensorFlow 2.20, Ultralytics YOLOv8
+        - **Visualization**: Plotly, Matplotlib
+        """)
 
 
 def classification_page():
@@ -807,167 +866,6 @@ def performance_page():
         st.info("No training history files found")
 
 
-def webcam_page():
-    """Live webcam detection page"""
-    
-    st.markdown("<h1 class='main-header'>📹 Live Webcam Detection</h1>", unsafe_allow_html=True)
-    st.markdown("Real-time object detection using your trained YOLOv8 model")
-    
-    if st.session_state.detection_model is None:
-        st.error("❌ YOLO model not loaded. Cannot run webcam detection.")
-        return
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.markdown("### Live Feed")
-        
-        # Webcam control
-        webcam_col1, webcam_col2 = st.columns(2)
-        
-        with webcam_col1:
-            if st.button("🎥 Start Webcam", use_container_width=True):
-                st.session_state.webcam_active = True
-        
-        with webcam_col2:
-            if st.button("⏹️ Stop Webcam", use_container_width=True):
-                st.session_state.webcam_active = False
-        
-        # Webcam feed placeholder
-        if st.session_state.webcam_active:
-            st.warning("""
-            ⚠️ Webcam functionality requires additional setup:
-            
-            1. Install OpenCV: `pip install opencv-python`
-            2. Grant camera permissions
-            3. Run locally (may not work in cloud deployment)
-            
-            For now, this is a simulation of live detection.
-            """)
-            
-            # Simulated webcam feed
-            placeholder = st.empty()
-            fps_display = st.empty()
-            
-            # Load a sample image for simulation
-            sample_image = "https://ultralytics.com/images/bus.jpg"
-            
-            for i in range(20):  # Simulate 20 frames
-                with placeholder.container():
-                    st.image(sample_image, caption=f"Frame {i+1} - Simulated Webcam Feed", use_container_width=True)
-                    
-                    # Random detections for demo
-                    num_objects = np.random.randint(2, 8)
-                    fps_display.metric("FPS", f"{np.random.randint(25, 35)}")
-                    
-                    # Show some random detections
-                    det_text = f"Detected {num_objects} objects: "
-                    classes = np.random.choice(Config.CLASS_NAMES[:10], num_objects, replace=False)
-                    det_text += ", ".join(classes)
-                    st.info(det_text)
-                
-                time.sleep(0.1)
-        else:
-            st.info("👆 Click 'Start Webcam' to begin live detection")
-    
-    with col2:
-        st.markdown("### 📊 Live Metrics")
-        
-        # Performance metrics
-        st.markdown("#### Performance")
-        st.metric("Target FPS", "30-35", "Real-time")
-        st.metric("Latency", "25-40ms", "Good")
-        st.metric("Resolution", "640x480", "VGA")
-        
-        st.markdown("#### Detection Stats")
-        st.metric("Avg Objects/Frame", "4.2")
-        st.metric("Classes Detected", "8")
-        st.metric("Processing", "GPU Accelerated")
-        
-        st.markdown("#### Settings")
-        show_labels = st.checkbox("Show Labels", value=True)
-        show_conf = st.checkbox("Show Confidence", value=True)
-        box_color = st.color_picker("Box Color", "#FF0000")
-        
-        st.info("⚡ For best performance, use GPU acceleration")
-
-
-def about_page():
-    """About page with documentation"""
-    
-    st.markdown("<h1 class='main-header'>ℹ️ About SmartVision AI</h1>", unsafe_allow_html=True)
-    
-    col1, col2 = st.columns([2, 1])
-    
-    with col1:
-        st.markdown("""
-        ## 🎯 Project Overview
-        
-        SmartVision AI is a comprehensive computer vision application that uses your 
-        **trained models** for object detection and classification.
-        
-        ### ✨ Features Using Your Models
-        
-        - **Multi-model Classification**: Compare results from your trained VGG16, ResNet50, 
-          MobileNetV2, and EfficientNetB0 models
-        - **YOLOv8 Detection**: Real-time object detection with your trained YOLO model
-        - **Performance Dashboard**: View actual metrics from your training
-        - **26 Object Classes**: Your model's trained categories
-        """)
-        
-        st.markdown("---")
-        
-        st.markdown(f"""
-        ## 📊 Your Model Performance
-        
-        ### Classification Models
-        - **VGG16**: {Config.CLASSIFICATION_METRICS['VGG16']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['VGG16']['time_ms']}ms
-        - **ResNet50**: {Config.CLASSIFICATION_METRICS['ResNet50']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['ResNet50']['time_ms']}ms
-        - **MobileNetV2**: {Config.CLASSIFICATION_METRICS['MobileNetV2']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['MobileNetV2']['time_ms']}ms
-        - **EfficientNetB0**: {Config.CLASSIFICATION_METRICS['EfficientNetB0']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['EfficientNetB0']['time_ms']}ms
-        
-        ### Detection Model
-        - **YOLOv8s**: {Config.YOLO_METRICS['mAP50']:.1%} mAP@0.5, {Config.YOLO_METRICS['fps']:.1f} FPS
-        - **{len(Config.CLASS_NAMES)} trained classes**
-        """)
-    
-    with col2:
-        st.markdown("""
-        ## 📁 Model Locations
-        
-        ### Classification Models
-        """)
-        
-        for model_name, path in Config.CLASSIFICATION_MODELS.items():
-            exists = os.path.exists(path)
-            status = "✅" if exists else "❌"
-            st.markdown(f"{status} **{model_name}**: `{os.path.basename(path)}`")
-        
-        st.markdown("### Detection Model")
-        yolo_exists = os.path.exists(Config.YOLO_MODEL_PATH)
-        status = "✅" if yolo_exists else "❌"
-        st.markdown(f"{status} **YOLOv8**: `{os.path.basename(Config.YOLO_MODEL_PATH)}`")
-        
-        st.markdown("---")
-        st.markdown(f"**Base Path:** `{Config.BASE_PATH}`")
-    
-    st.markdown("---")
-    
-    # Developer information
-    st.markdown("""
-    ## 👨‍💻 Developer Information
-    
-    This application uses your trained models from:
-    - **Transfer Learning Models**: VGG16, ResNet50, MobileNetV2, EfficientNetB0
-    - **Detection Model**: YOLOv8 trained on your dataset
-    
-    ### Technologies Used
-    - **Frontend**: Streamlit
-    - **ML Framework**: TensorFlow 2.20, Ultralytics YOLOv8
-    - **Visualization**: Plotly, Matplotlib
-    """)
-
-
 # ========== MAIN APP ==========
 
 def main():
@@ -982,10 +880,6 @@ def main():
         detection_page()
     elif st.session_state.page == "Performance":
         performance_page()
-    elif st.session_state.page == "Webcam":
-        webcam_page()
-    elif st.session_state.page == "About":
-        about_page()
     
     # Footer
     st.markdown("---")
