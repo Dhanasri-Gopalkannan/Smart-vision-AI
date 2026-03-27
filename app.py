@@ -77,7 +77,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# ========== CONFIGURATION - UPDATE THESE PATHS ==========
+# ========== CONFIGURATION ==========
 class Config:
     """Configuration class with paths to your trained models"""
     
@@ -95,15 +95,6 @@ class Config:
         #'EfficientNetB0': os.path.join(BASE_PATH, "Transfer_learningmodel_results","fixed_models" "EfficientNetB0_fixed.h5")
     }
     
-    # Alternative model names (if your files have different names)
-    # Uncomment and modify if needed
-    # CLASSIFICATION_MODELS = {
-    #     'VGG16': os.path.join(BASE_PATH, "Transfer_learningmodel_results", "VGG16_best.h5"),
-    #     'ResNet50': os.path.join(BASE_PATH, "Transfer_learningmodel_results", "ResNet50_best.h5"),
-    #     'MobileNetV2': os.path.join(BASE_PATH, "Transfer_learningmodel_results", "MobileNetV2_best.h5"),
-    #     'EfficientNetB0': os.path.join(BASE_PATH, "Transfer_learningmodel_results", "EfficientNetB0_best.h5")
-    # }
-    
     # YOLO results folder (for metrics)
     YOLO_RESULTS_PATH = os.path.join(BASE_PATH, "yolov8_complete_results")
     
@@ -118,7 +109,7 @@ class Config:
     # Image parameters
     IMAGE_SIZE = (224, 224)
     
-    # Performance metrics from your training (UPDATE THESE WITH YOUR ACTUAL METRICS)
+    # Performance metrics from your training 
     CLASSIFICATION_METRICS = {
         'VGG16': {'accuracy': 0.824, 'precision': 0.83, 'recall': 0.82, 'f1': 0.82, 'time_ms': 45},
         'ResNet50': {'accuracy': 0.871, 'precision': 0.87, 'recall': 0.86, 'f1': 0.86, 'time_ms': 38},
@@ -152,7 +143,7 @@ def init_session_state():
         st.session_state.classification_models = {}
         st.session_state.classification_status = {}
         
-        st.sidebar.markdown("### 📥 Loading Models...")
+        st.sidebar.markdown("###  Loading Models...")
         
         for model_name, model_path in Config.CLASSIFICATION_MODELS.items():
             if os.path.exists(model_path):
@@ -161,11 +152,11 @@ def init_session_state():
                         # Load model without compilation to save memory
                         model = load_model(model_path, compile=False)
                         st.session_state.classification_models[model_name] = model
-                        st.session_state.classification_status[model_name] = "✅ Loaded"
+                        st.session_state.classification_status[model_name] = " Loaded"
                 except Exception as e:
-                    st.session_state.classification_status[model_name] = f"❌ Error: {str(e)[:50]}"
+                    st.session_state.classification_status[model_name] = f" Error: {str(e)[:50]}"
             else:
-                st.session_state.classification_status[model_name] = "❌ Not Found"
+                st.session_state.classification_status[model_name] = " Not Found"
     
     # Load YOLO detection model
     if 'detection_model' not in st.session_state:
@@ -173,11 +164,11 @@ def init_session_state():
             try:
                 with st.spinner("Loading YOLOv8 model..."):
                     st.session_state.detection_model = YOLO(Config.YOLO_MODEL_PATH)
-                st.session_state.detection_status = "✅ Loaded"
+                st.session_state.detection_status = " Loaded"
             except Exception as e:
-                st.session_state.detection_status = f"❌ Error: {str(e)[:50]}"
+                st.session_state.detection_status = f" Error: {str(e)[:50]}"
         else:
-            st.session_state.detection_status = "❌ Not Found"
+            st.session_state.detection_status = " Not Found"
     
     # Results storage
     if 'classification_results' not in st.session_state:
@@ -207,7 +198,7 @@ with st.sidebar:
             st.session_state.page = page
     
     st.markdown("---")
-    st.markdown("### ⚙️ Settings")
+    st.markdown("###  Settings")
     
     # Global settings
     st.session_state.confidence_threshold = st.slider(
@@ -219,21 +210,21 @@ with st.sidebar:
     )
     
     st.markdown("---")
-    st.markdown("### 📁 Model Status")
+    st.markdown("###  Model Status")
     
     # Classification model status
     st.markdown("#### Classification Models")
     for model_name, status in st.session_state.classification_status.items():
-        if "✅" in status:
+        if "" in status:
             st.success(f"{model_name}: {status}")
-        elif "❌" in status:
+        elif "" in status:
             st.error(f"{model_name}: {status}")
         else:
             st.warning(f"{model_name}: {status}")
     
     # YOLO status
     st.markdown("#### Detection Model")
-    if "✅" in st.session_state.detection_status:
+    if "" in st.session_state.detection_status:
         st.success(f"YOLOv8: {st.session_state.detection_status}")
     else:
         st.error(f"YOLOv8: {st.session_state.detection_status}")
@@ -410,7 +401,7 @@ def home_page():
     with col2:
         st.markdown("""
         <div class='metric-card'>
-            <h3>🧠 CNN Models</h3>
+            <h3> CNN Models</h3>
             <h2>4</h2>
             <p>VGG16, ResNet50, MobileNetV2, EfficientNetB0</p>
         </div>
@@ -419,7 +410,7 @@ def home_page():
     with col3:
         st.markdown("""
         <div class='metric-card'>
-            <h3>🎯 YOLOv8</h3>
+            <h3> YOLOv8</h3>
             <h2>{:.1%}</h2>
             <p>mAP@0.5</p>
         </div>
@@ -429,7 +420,7 @@ def home_page():
         best_model = max(Config.CLASSIFICATION_METRICS.items(), key=lambda x: x[1]['accuracy'])
         st.markdown("""
         <div class='metric-card'>
-            <h3>🏆 Best CNN</h3>
+            <h3> Best CNN</h3>
             <h2>{}</h2>
             <p>{:.1%} Accuracy</p>
         </div>
@@ -441,9 +432,9 @@ def home_page():
     col1, col2 = st.columns(2)
     
     with col1:
-        st.markdown("### 📊 Classification Models")
+        st.markdown("###  Classification Models")
         for model_name, status in st.session_state.classification_status.items():
-            if "✅" in status:
+            if "" in status:
                 metrics = Config.CLASSIFICATION_METRICS.get(model_name, {})
                 acc = metrics.get('accuracy', 0)
                 st.success(f"**{model_name}**: {acc:.1%} accuracy")
@@ -451,8 +442,8 @@ def home_page():
                 st.error(f"**{model_name}**: Not loaded")
     
     with col2:
-        st.markdown("### 🎯 Detection Model")
-        if "✅" in st.session_state.detection_status:
+        st.markdown("###  Detection Model")
+        if "" in st.session_state.detection_status:
             st.success(f"**YOLOv8**: {Config.YOLO_METRICS['mAP50']:.1%} mAP@0.5, {Config.YOLO_METRICS['fps']:.1f} FPS")
         else:
             st.error("**YOLOv8**: Not loaded")
@@ -460,7 +451,7 @@ def home_page():
     st.markdown("---")
     
     # Quick start
-    st.markdown("## 🚀 Quick Start")
+    st.markdown("##  Quick Start")
     
     quick_col1, quick_col2, quick_col3 = st.columns(3)
     
@@ -494,7 +485,7 @@ def home_page():
     
     with col1:
         st.markdown("""
-        ### 🎯 Project Overview
+        ###  Project Overview
         
         SmartVision AI is a comprehensive computer vision application that uses your 
         **trained models** for object detection and classification.
@@ -509,7 +500,7 @@ def home_page():
         """)
         
         st.markdown(f"""
-        #### 📊 Your Model Performance
+        ####  Your Model Performance
         
         **Classification Models**
         - **VGG16**: {Config.CLASSIFICATION_METRICS['VGG16']['accuracy']:.1%} accuracy, {Config.CLASSIFICATION_METRICS['VGG16']['time_ms']}ms
@@ -524,19 +515,19 @@ def home_page():
     
     with col2:
         st.markdown("""
-        ### 📁 Model Locations
+        ###  Model Locations
         
         #### Classification Models
         """)
         
         for model_name, path in Config.CLASSIFICATION_MODELS.items():
             exists = os.path.exists(path)
-            status = "✅" if exists else "❌"
+            status = "" if exists else ""
             st.markdown(f"{status} **{model_name}**: `{os.path.basename(path)}`")
         
         st.markdown("#### Detection Model")
         yolo_exists = os.path.exists(Config.YOLO_MODEL_PATH)
-        status = "✅" if yolo_exists else "❌"
+        status = "" if yolo_exists else ""
         st.markdown(f"{status} **YOLOv8**: `{os.path.basename(Config.YOLO_MODEL_PATH)}`")
         
         st.markdown("---")
@@ -544,7 +535,7 @@ def home_page():
         
         st.markdown("---")
         st.markdown("""
-        ### 👨‍💻 Technologies Used
+        ###  Technologies Used
         - **Frontend**: Streamlit
         - **ML Framework**: TensorFlow 2.20, Ultralytics YOLOv8
         - **Visualization**: Plotly, Matplotlib
@@ -554,19 +545,19 @@ def home_page():
 def classification_page():
     """Image classification page with your actual models"""
     
-    st.markdown("<h1 class='main-header'>📷 Image Classification</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-header'> Image Classification</h1>", unsafe_allow_html=True)
     st.markdown("Upload an image to classify with your trained CNN models")
     
     # Check if models are loaded
     if len(st.session_state.classification_models) == 0:
-        st.error("❌ No classification models loaded. Please check the model paths.")
+        st.error(" No classification models loaded. Please check the model paths.")
         st.info(f"Looking for models in: {Config.BASE_PATH}")
         return
     
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.markdown("### 📤 Upload Image")
+        st.markdown("###  Upload Image")
         uploaded_file = st.file_uploader(
             "Choose an image...", 
             type=['jpg', 'jpeg', 'png'],
@@ -579,13 +570,13 @@ def classification_page():
             st.image(image, caption="Uploaded Image", use_container_width=True)
             
             # Classify button
-            if st.button("🔍 Classify with All Models", use_container_width=True):
+            if st.button(" Classify with All Models", use_container_width=True):
                 with st.spinner("Classifying with all models..."):
                     results = classify_with_all_models(image)
                     st.session_state.classification_results = results
     
     with col2:
-        st.markdown("### 📊 Classification Results")
+        st.markdown("###  Classification Results")
         
         if st.session_state.classification_results:
             # Display results for each model
@@ -611,7 +602,7 @@ def classification_page():
                             st.progress(conf, text=f"{class_name}: {conf:.2%}")
             
             # Model comparison
-            st.markdown("### 📈 Model Comparison")
+            st.markdown("###  Model Comparison")
             
             comparison_data = []
             for model_name, result in st.session_state.classification_results.items():
@@ -626,25 +617,25 @@ def classification_page():
             if comparison_data:
                 st.table(pd.DataFrame(comparison_data))
         else:
-            st.info("👆 Upload an image and click 'Classify' to see results")
+            st.info(" Upload an image and click 'Classify' to see results")
 
 
 def detection_page():
     """Object detection page with your YOLO model"""
     
-    st.markdown("<h1 class='main-header'>🎯 Object Detection</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-header'> Object Detection</h1>", unsafe_allow_html=True)
     st.markdown("Upload an image to detect objects using your trained YOLOv8 model")
     
     # Check if YOLO model is loaded
     if st.session_state.detection_model is None:
-        st.error("❌ YOLO model not loaded. Please check the model path.")
+        st.error(" YOLO model not loaded. Please check the model path.")
         st.info(f"Looking for model at: {Config.YOLO_MODEL_PATH}")
         return
     
     col1, col2 = st.columns([1, 1])
     
     with col1:
-        st.markdown("### 📤 Upload Image")
+        st.markdown("###  Upload Image")
         uploaded_file = st.file_uploader(
             "Choose an image...", 
             type=['jpg', 'jpeg', 'png'],
@@ -667,13 +658,13 @@ def detection_page():
             st.image(image, caption="Uploaded Image", use_container_width=True)
             
             # Detect button
-            if st.button("🔍 Detect Objects", use_container_width=True):
+            if st.button(" Detect Objects", use_container_width=True):
                 with st.spinner("Detecting objects..."):
                     results = detect_objects_yolo(image, conf_threshold)
                     st.session_state.detection_results = results
     
     with col2:
-        st.markdown("### 📊 Detection Results")
+        st.markdown("###  Detection Results")
         
         if st.session_state.detection_results:
             results = st.session_state.detection_results
@@ -693,7 +684,7 @@ def detection_page():
                     st.progress(det['confidence'])
             
             # Visualization
-            st.markdown("### 👁️ Visualization")
+            st.markdown("###  Visualization")
             fig = draw_detection_results(image, results['detections'])
             st.pyplot(fig)
             plt.close()
@@ -701,19 +692,19 @@ def detection_page():
             # Download results
             results_json = json.dumps(results['detections'], indent=2)
             st.download_button(
-                label="📥 Download Results",
+                label=" Download Results",
                 data=results_json,
                 file_name="detection_results.json",
                 mime="application/json"
             )
         else:
-            st.info("👆 Upload an image and click 'Detect' to see results")
+            st.info(" Upload an image and click 'Detect' to see results")
 
 
 def performance_page():
     """Model performance dashboard with your actual metrics"""
     
-    st.markdown("<h1 class='main-header'>📊 Model Performance</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 class='main-header'> Model Performance</h1>", unsafe_allow_html=True)
     st.markdown("Performance metrics from your trained models")
     
     # Top metrics
@@ -723,7 +714,7 @@ def performance_page():
         best_model = max(Config.CLASSIFICATION_METRICS.items(), key=lambda x: x[1]['accuracy'])
         st.markdown(f"""
         <div class='metric-card'>
-            <h3>🏆 Best CNN</h3>
+            <h3> Best CNN</h3>
             <h2>{best_model[0]}</h2>
             <p>{best_model[1]['accuracy']:.1%} Accuracy</p>
         </div>
@@ -733,7 +724,7 @@ def performance_page():
         fastest_model = min(Config.CLASSIFICATION_METRICS.items(), key=lambda x: x[1]['time_ms'])
         st.markdown(f"""
         <div class='metric-card'>
-            <h3>⚡ Fastest CNN</h3>
+            <h3> Fastest CNN</h3>
             <h2>{fastest_model[0]}</h2>
             <p>{fastest_model[1]['time_ms']}ms inference</p>
         </div>
@@ -742,7 +733,7 @@ def performance_page():
     with col3:
         st.markdown(f"""
         <div class='metric-card'>
-            <h3>🎯 YOLO mAP</h3>
+            <h3> YOLO mAP</h3>
             <h2>{Config.YOLO_METRICS['mAP50']:.1%}</h2>
             <p>mAP@0.5</p>
         </div>
@@ -751,7 +742,7 @@ def performance_page():
     with col4:
         st.markdown(f"""
         <div class='metric-card'>
-            <h3>⚡ YOLO Speed</h3>
+            <h3> YOLO Speed</h3>
             <h2>{Config.YOLO_METRICS['fps']:.1f} FPS</h2>
             <p>{Config.YOLO_METRICS['inference_time_ms']}ms per image</p>
         </div>
@@ -760,7 +751,7 @@ def performance_page():
     st.markdown("---")
     
     # Classification Models Performance
-    st.markdown("## 📈 Classification Models")
+    st.markdown("##  Classification Models")
     
     tab1, tab2, tab3 = st.tabs(["Accuracy Comparison", "Speed Comparison", "Detailed Metrics"])
     
@@ -818,7 +809,7 @@ def performance_page():
     st.markdown("---")
     
     # YOLO Performance
-    st.markdown("## 🎯 YOLOv8 Detection Performance")
+    st.markdown("##  YOLOv8 Detection Performance")
     
     yolo_col1, yolo_col2, yolo_col3 = st.columns(3)
     
@@ -836,7 +827,7 @@ def performance_page():
     
     # Training history plots
     st.markdown("---")
-    st.markdown("## 📊 Training History")
+    st.markdown("##  Training History")
     
     history_files = glob.glob(os.path.join(Config.YOLO_RESULTS_PATH, "*.csv"))
     history_files.extend(glob.glob(os.path.join(Config.BASE_PATH, "Transfer_learningmodel_results", "*.csv")))
@@ -887,7 +878,7 @@ def main():
         "<div style='text-align: center; color: gray; padding: 1rem;'>"
         "SmartVision AI © 2026 | Using your trained models | "
         f"CNN Models: {len(st.session_state.classification_models)}/4 loaded | "
-        f"YOLO: {'✅' if st.session_state.detection_model else '❌'}"
+        f"YOLO: {'' if st.session_state.detection_model else '❌'}"
         "</div>",
         unsafe_allow_html=True
     )

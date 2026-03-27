@@ -1,7 +1,3 @@
-"""
-Dataset Processing Pipeline - Updated for your detection structure
-"""
-
 import os
 import json
 import cv2
@@ -52,8 +48,8 @@ class DatasetProcessor:
     A.Rotate(limit=15, p=0.5),
     A.RandomBrightnessContrast(brightness_limit=0.2, contrast_limit=0.2, p=0.5),
     A.HueSaturationValue(hue_shift_limit=20, sat_shift_limit=30, val_shift_limit=20, p=0.5),
-    A.CenterCrop(height=200, width=200, p=0.5),  # Simpler alternative
-    A.Resize(height=224, width=224, p=1.0),      # Always resize to 224x224
+    A.CenterCrop(height=200, width=200, p=0.5),  
+    A.Resize(height=224, width=224, p=1.0),    
 ])
         
         # Detection augmentations

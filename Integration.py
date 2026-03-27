@@ -61,7 +61,7 @@ sys.stderr = original_stderr
 print("="*70)
 print("OBJECT DETECTION & CLASSIFICATION PIPELINE")
 print("="*70)
-print("✅ All imports successful")
+print(" All imports successful")
 
 
 # ========== CONFIGURATION ==========
@@ -195,12 +195,12 @@ class ObjectDetectionPipeline:
         self.post_processor = PostProcessor()
         
         # Load YOLO model
-        print(f"\n📥 Loading YOLO model...")
+        print(f"\n Loading YOLO model...")
         if os.path.exists(config.YOLO_MODEL_PATH):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
                 self.detection_model = YOLO(config.YOLO_MODEL_PATH)
-            print("✅ YOLO model loaded successfully")
+            print(" YOLO model loaded successfully")
         else:
             raise FileNotFoundError(f"YOLO model not found at {config.YOLO_MODEL_PATH}")
         
@@ -208,7 +208,7 @@ class ObjectDetectionPipeline:
         self.classification_model = None
         if os.path.exists(config.CLASSIFICATION_MODEL_PATH):
             try:
-                print(f"📥 Loading classification model...")
+                print(f" Loading classification model...")
                 with warnings.catch_warnings():
                     warnings.simplefilter("ignore")
                     # Suppress TensorFlow loading messages
@@ -223,16 +223,16 @@ class ObjectDetectionPipeline:
                     sys.stdout.close()
                     sys.stdout = original_stdout
                     
-                print("✅ Classification model loaded successfully")
+                print(" Classification model loaded successfully")
             except Exception as e:
-                print(f"⚠️ Could not load classification model: {e}")
+                print(f" Could not load classification model: {e}")
                 self.classification_model = None
         else:
-            print("⚠️ Classification model not found. Using YOLO only.")
+            print(" Classification model not found. Using YOLO only.")
         
         # Create output directory
         os.makedirs(config.OUTPUT_DIR, exist_ok=True)
-        print(f"\n📁 Output directory: {config.OUTPUT_DIR}")
+        print(f"\n Output directory: {config.OUTPUT_DIR}")
     
     def preprocess_for_classification(self, image_array):
         """Preprocess image for classification model"""
@@ -285,7 +285,7 @@ class ObjectDetectionPipeline:
     
     def detect(self, image_path, use_classification=True, save_result=True):
         """Main detection function"""
-        print(f"\n🔍 Processing: {os.path.basename(image_path)}")
+        print(f"\n Processing: {os.path.basename(image_path)}")
         start_time = time.time()
         
         # Load image
@@ -411,13 +411,13 @@ class ObjectDetectionPipeline:
         json_path = os.path.join(self.config.OUTPUT_DIR, filename)
         with open(json_path, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"\n📄 Results saved to: {json_path}")
+        print(f"\n Results saved to: {json_path}")
         return json_path
     
     def process_folder(self, folder_path, max_images=None):
         """Process all images in a folder"""
         if not os.path.exists(folder_path):
-            print(f"❌ Folder not found: {folder_path}")
+            print(f" Folder not found: {folder_path}")
             return []
         
         # Get all image files
@@ -429,10 +429,10 @@ class ObjectDetectionPipeline:
             image_files = image_files[:max_images]
         
         if not image_files:
-            print(f"❌ No images found in {folder_path}")
+            print(f" No images found in {folder_path}")
             return []
         
-        print(f"\n📁 Found {len(image_files)} images in folder")
+        print(f"\n Found {len(image_files)} images in folder")
         
         results = []
         for i, img_file in enumerate(image_files):
@@ -461,25 +461,25 @@ if __name__ == "__main__":
     try:
         pipeline = ObjectDetectionPipeline(Config)
     except Exception as e:
-        print(f"\n❌ Failed to initialize pipeline: {e}")
+        print(f"\n Failed to initialize pipeline: {e}")
         sys.exit(1)
     
     # Check which mode to run
     if hasattr(Config, 'SINGLE_IMAGE_PATH') and os.path.exists(Config.SINGLE_IMAGE_PATH):
         # Process single image
-        print(f"\n📷 Processing single image: {Config.SINGLE_IMAGE_PATH}")
+        print(f"\n Processing single image: {Config.SINGLE_IMAGE_PATH}")
         result = pipeline.detect(
             Config.SINGLE_IMAGE_PATH, 
             use_classification=Config.USE_CLASSIFICATION
         )
         
-        print("\n📊 DETECTION RESULTS:")
+        print("\n DETECTION RESULTS:")
         print(json.dumps(result, indent=2))
         pipeline.save_results_json(result, "single_image_results.json")
         
     elif os.path.exists(Config.IMAGE_FOLDER_PATH):
         # Process folder
-        print(f"\n📁 Processing folder: {Config.IMAGE_FOLDER_PATH}")
+        print(f"\n Processing folder: {Config.IMAGE_FOLDER_PATH}")
         
         if Config.PROCESS_MODE == "folder":
             # Process all images
@@ -494,19 +494,19 @@ if __name__ == "__main__":
                 max_images=Config.BATCH_SIZE
             )
         else:
-            print(f"❌ Invalid PROCESS_MODE: {Config.PROCESS_MODE}")
+            print(f" Invalid PROCESS_MODE: {Config.PROCESS_MODE}")
             results = []
         
         if results:
             pipeline.save_results_json(results, "folder_results.json")
-            print(f"\n✅ Processed {len(results)} images successfully")
+            print(f"\n Processed {len(results)} images successfully")
     
     else:
-        print("\n❌ No valid image path found in configuration!")
+        print("\n No valid image path found in configuration!")
         print("\nPlease update the Config class with either:")
         print("  - IMAGE_FOLDER_PATH = r'path/to/your/image/folder'")
         print("  - SINGLE_IMAGE_PATH = r'path/to/your/image.jpg'")
     
     print("\n" + "="*70)
-    print("✅ PIPELINE EXECUTION COMPLETE")
+    print(" PIPELINE EXECUTION COMPLETE")
     print("="*70)
